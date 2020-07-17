@@ -9,26 +9,27 @@ const dbName='conFusion'
 MongoClient.connect(url, (err, client)=>{
     assert.equal(err, null)
     console.log('Connected')
-    const db = client.db(dbName);
+    const db = client.db(dbName) 
     
-    dbOperations.insertDocument(db, {name:"test name", description:"test-description"}, "dishes", (result)=>{
-        console.log("Insert Documents : ", result)
+    dbOperations.insertDocument(db, { name: "test-name", description: "test-description"}, "dishes", (result) => {
+        console.log("Insert Document:\n", result) 
+
+        dbOperations.findDocuments(db, "dishes", (docs) => {
+            console.log("Found Documents:\n", docs) 
+
+            dbOperations.updateDocument(db, { name: "test-name" },{ description: "updated-test-description"}, "dishes", (result) => {
+                console.log("Updated Document:\n", result.result) 
+
+                dbOperations.findDocuments(db, "dishes", (docs) => {
+                    console.log("Found Updated Documents:\n", docs) 
+                    
+                    db.dropCollection("dishes", (result) => {
+                        console.log("Dropped Collection: ", result) 
+
+                        client.close()
+                    })
+                })
+            })
+        })
     })
-    // dbOperations.findDocuments(db, "dishes", (docs)=>{
-    //     console.log("Found Documents : ", docs)
-    // })
-    // dbOperations.updateDocument(db, {name:"test name"}, {description:"test-update"}, "dishes", (result) =>{
-    //     console.log("Update Document : ", result.result)
-    // })
-    // dbOperations.findDocuments(db, "dishes", (docs)=>{
-    //     console.log("Found Documents : ", docs)
-    // })
-    db.dropCollection("dishes", (result)=>{
-        console.log("Dropped Collection", result)
-    })
-    
-    //ns error while dropping collection
-    //because of asynchronous implementation?
-    // only when this action is done , do this scene
-    //drop collection should be inside collection?
 })
